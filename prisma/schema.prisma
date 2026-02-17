@@ -1,0 +1,30 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../node_modules/.prisma/client"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  status      String   @default("active")
+  techStack   String[]
+  memeUrl     String?
+  repoUrl     String?
+  liveUrl     String?
+  visible     Boolean  @default(true)
+  featured    Boolean  @default(false)
+  // GitHub sync fields
+  githubId    Int?     @unique
+  stars       Int      @default(0)
+  forks       Int      @default(0)
+  language    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
