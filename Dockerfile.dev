@@ -5,10 +5,23 @@ WORKDIR /app
 COPY package.json bun.lock* ./
 RUN bun install
 
-# Generate Prisma client
-COPY prisma ./prisma
-ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-RUN bunx prisma generate
+# Turbopack (Next.js 16) resolves certain packages as hash-suffixed external module
+# names (e.g. @prisma/client-2c3a... pg-5877...) that don't exist in node_modules.
+# These stubs re-export the real packages so require() can find them.
+# Hashes are deterministic per package version: @prisma/client@7.3.0, pg@8.x
+RUN node -e " \
+  const fs = require('fs'); \
+  const stubs = { \
+    '@prisma/client-2c3a283f134fdcb6': '../../.prisma/client', \
+    '@prisma/adapter-pg-994324666b79ccf3': '@prisma/adapter-pg', \
+    'pg-587764f78a6c7a9c': 'pg' \
+  }; \
+  for (const [stub, real] of Object.entries(stubs)) { \
+    fs.mkdirSync('node_modules/' + stub, {recursive: true}); \
+    fs.writeFileSync('node_modules/' + stub + '/package.json', JSON.stringify({name: stub, version: '1.0.0', main: 'index.js'})); \
+    fs.writeFileSync('node_modules/' + stub + '/index.js', 'module.exports = require(' + JSON.stringify(real) + ');'); \
+  } \
+"
 
 # Install cloudflared for SSH tunneling
 RUN apk add --no-cache wget \
@@ -18,5 +31,14 @@ RUN apk add --no-cache wget \
     && apk del wget \
     || echo "Warning: cloudflared installation failed"
 
+# Copy source files so the container has them at startup
+# (docker compose watch will sync changes after startup)
+COPY app ./app
+COPY components ./components
+COPY lib ./lib
+COPY public ./public
+COPY prisma ./prisma
+COPY tsconfig.json next.config.ts postcss.config.mjs ./
+
 EXPOSE 3000
-CMD ["bunx", "next", "dev", "--hostname", "0.0.0.0"]
+CMD ["sh", "-c", "bunx prisma generate && bunx next dev --hostname 0.0.0.0"]

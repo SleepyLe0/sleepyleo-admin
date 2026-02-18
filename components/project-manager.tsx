@@ -68,6 +68,8 @@ export function ProjectManager() {
   const [importingId, setImportingId] = useState<number | null>(null);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [editProject, setEditProject] = useState<Project | null>(null);
+  const [deleteProject, setDeleteProject] = useState<Project | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Fetch projects from database
   const fetchProjects = async () => {
@@ -187,19 +189,22 @@ export function ProjectManager() {
   };
 
   // Delete project
-  const deleteProject = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
-
+  const confirmDelete = async () => {
+    if (!deleteProject) return;
+    setDeleting(true);
     try {
-      const response = await fetch(`/api/projects?id=${id}`, {
+      const response = await fetch(`/api/projects?id=${deleteProject.id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
-        setProjects((prev) => prev.filter((p) => p.id !== id));
+        setProjects((prev) => prev.filter((p) => p.id !== deleteProject.id));
+        setDeleteProject(null);
       }
     } catch (error) {
       console.error("Failed to delete project:", error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -354,7 +359,7 @@ export function ProjectManager() {
                         size="sm"
                         variant="ghost"
                         className="text-red-400 hover:text-red-300"
-                        onClick={() => deleteProject(project.id)}
+                        onClick={() => setDeleteProject(project)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -437,6 +442,41 @@ export function ProjectManager() {
               })
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteProject} onOpenChange={() => setDeleteProject(null)}>
+        <DialogContent className="bg-neutral-900 border-neutral-800 max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-white">Delete Project</DialogTitle>
+          </DialogHeader>
+          <p className="text-neutral-400 text-sm">
+            Are you sure you want to delete{" "}
+            <span className="text-white font-medium">{deleteProject?.name}</span>?
+            This action cannot be undone.
+          </p>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteProject(null)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleting}
+            >
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Trash2 className="h-4 w-4 mr-2" />
+              )}
+              Delete
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
