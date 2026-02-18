@@ -43,7 +43,6 @@ RUN apk add --no-cache wget \
     || echo "Warning: cloudflared installation failed"
 
 # Copy built assets with correct ownership
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
