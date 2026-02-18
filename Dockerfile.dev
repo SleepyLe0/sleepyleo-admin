@@ -36,7 +36,6 @@ RUN apk add --no-cache wget \
 COPY app ./app
 COPY components ./components
 COPY lib ./lib
-COPY public ./public
 COPY prisma ./prisma
 COPY tsconfig.json next.config.ts postcss.config.mjs ./
 
