@@ -28,6 +28,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MemePicker } from "@/components/meme-picker";
 
 interface Project {
   id: string;
@@ -68,8 +69,13 @@ export function ProjectManager() {
   const [importingId, setImportingId] = useState<number | null>(null);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [editProject, setEditProject] = useState<Project | null>(null);
+  const [pendingMemeUrl, setPendingMemeUrl] = useState<string | null>(null);
   const [deleteProject, setDeleteProject] = useState<Project | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    setPendingMemeUrl(editProject?.memeUrl ?? null);
+  }, [editProject]);
 
   // Fetch projects from database
   const fetchProjects = async () => {
@@ -495,7 +501,7 @@ export function ProjectManager() {
                   name: formData.get("name") as string,
                   description: formData.get("description") as string,
                   liveUrl: formData.get("liveUrl") as string,
-                  memeUrl: formData.get("memeUrl") as string,
+                  memeUrl: pendingMemeUrl ?? "",
                 });
               }}
               className="space-y-4"
@@ -526,12 +532,10 @@ export function ProjectManager() {
                 />
               </div>
               <div>
-                <label className="text-sm text-neutral-400">Meme GIF URL</label>
-                <Input
-                  name="memeUrl"
-                  defaultValue={editProject.memeUrl || ""}
-                  className="bg-neutral-800 border-neutral-700"
-                  placeholder="https://media.giphy.com/..."
+                <label className="text-sm text-neutral-400 block mb-2">Meme GIF</label>
+                <MemePicker
+                  currentUrl={pendingMemeUrl}
+                  onSelect={setPendingMemeUrl}
                 />
               </div>
               <DialogFooter>
