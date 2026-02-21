@@ -70,6 +70,22 @@ export async function executeCommand(command: string): Promise<{
     "curl",
     "nc ",
     "netcat",
+    "eval",
+    "exec",
+    "base64",
+    "python -c",
+    "perl -e",
+    "bash -c",
+    "> /etc/",
+    ">> /etc/",
+    "/etc/passwd",
+    "/etc/shadow",
+    "shutdown",
+    "reboot",
+    "halt",
+    "poweroff",
+    "kill -9 1",
+    "killall",
   ];
 
   const lowerCommand = command.toLowerCase();
@@ -98,6 +114,9 @@ export async function executeCommand(command: string): Promise<{
 
   try {
     const result = await executeRemoteCommand(command);
+    if (result.success && result.output) {
+      result.output = result.output.slice(0, 50 * 1024);
+    }
     return result;
   } catch (error) {
     const execError = error as { message: string };

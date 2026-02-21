@@ -4,7 +4,7 @@ import { isAuthenticated } from "@/lib/auth";
 import { ProjectManager } from "@/components/project-manager";
 import { LogoutButton } from "@/components/logout-button";
 import Link from "next/link";
-import { Bot, ArrowRight, Activity, Home } from "lucide-react";
+import { Bot, ArrowRight, Activity, Home, User, Code2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Dashboard - Project Manager",
@@ -51,6 +51,26 @@ export default async function AdminPage() {
               </div>
               <span className="text-sm font-medium text-white">AI Intern</span>
               <ArrowRight className="h-4 w-4 text-indigo-400 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/profile"
+              className="group flex items-center gap-2 rounded-lg border border-white/10 bg-neutral-900/50 px-4 py-2 transition-all hover:border-indigo-500/50 hover:bg-indigo-900/10"
+            >
+              <div className="inline-flex rounded-md bg-indigo-500/20 p-1.5 text-indigo-400 group-hover:text-indigo-300">
+                <User className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-medium text-white">Profile</span>
+              <ArrowRight className="h-4 w-4 text-indigo-400 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/skills"
+              className="group flex items-center gap-2 rounded-lg border border-white/10 bg-neutral-900/50 px-4 py-2 transition-all hover:border-violet-500/50 hover:bg-violet-900/10"
+            >
+              <div className="inline-flex rounded-md bg-violet-500/20 p-1.5 text-violet-400 group-hover:text-violet-300">
+                <Code2 className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-medium text-white">Skills</span>
+              <ArrowRight className="h-4 w-4 text-violet-400 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" />
             </Link>
           </div>
         </div>

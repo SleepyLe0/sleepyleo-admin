@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { executeCommand } from "@/lib/actions";
+import { isAuthenticated } from "@/lib/auth";
 import emotionsData from "./emotions.json";
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
@@ -123,6 +124,10 @@ interface Message {
 }
 
 export async function POST(request: Request) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   if (!OPENROUTER_API_KEY) {
     return NextResponse.json(
       { error: "OpenRouter API key not configured" },

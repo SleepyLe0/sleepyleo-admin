@@ -1,23 +1,47 @@
 import { cookies } from "next/headers";
+import crypto from "crypto";
 
 const AUTH_COOKIE_NAME = "sleepyleo_auth";
 const AUTH_SECRET = process.env.AUTH_SECRET || "default-secret-change-me";
 
-// Simple hash function for session token
-function hashToken(input: string): string {
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
+// Startup validation — warn loudly if the secret is missing or default in production
+if (process.env.NODE_ENV === "production") {
+  if (!process.env.AUTH_SECRET) {
+    console.error("[auth] FATAL: AUTH_SECRET environment variable is not set in production!");
+  } else if (process.env.AUTH_SECRET === "default-secret-change-me") {
+    console.error("[auth] FATAL: AUTH_SECRET is still set to the default value in production!");
   }
-  return Math.abs(hash).toString(36) + AUTH_SECRET.slice(0, 8);
 }
 
 export function generateSessionToken(): string {
-  const timestamp = Date.now().toString();
-  const random = Math.random().toString(36).substring(2);
-  return hashToken(timestamp + random + AUTH_SECRET);
+  const timestamp = Date.now().toString(16);
+  const random = crypto.randomBytes(32).toString("hex");
+  const payload = `${timestamp}.${random}`;
+  const hmac = crypto
+    .createHmac("sha256", AUTH_SECRET)
+    .update(payload)
+    .digest("hex");
+  return `${payload}.${hmac}`;
+}
+
+export function verifySessionToken(token: string): boolean {
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
+  const [timestamp, random, providedHmac] = parts;
+  const payload = `${timestamp}.${random}`;
+  const expectedHmac = crypto
+    .createHmac("sha256", AUTH_SECRET)
+    .update(payload)
+    .digest("hex");
+
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(providedHmac, "hex"),
+      Buffer.from(expectedHmac, "hex")
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function validateCredentials(username: string, password: string): boolean {
@@ -55,5 +79,6 @@ export async function clearAuthCookie(): Promise<void> {
 
 export async function isAuthenticated(): Promise<boolean> {
   const token = await getAuthCookie();
-  return !!token;
+  if (!token) return false;
+  return verifySessionToken(token);
 }
