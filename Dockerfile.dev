@@ -40,4 +40,4 @@ COPY prisma ./prisma
 COPY tsconfig.json next.config.ts postcss.config.mjs prisma.config.ts ./
 
 EXPOSE 3000
-CMD ["sh", "-c", "bunx prisma migrate deploy && bunx prisma generate && bunx next dev --hostname 0.0.0.0"]
+CMD ["sh", "-c", "bunx prisma generate && bunx next dev --hostname 0.0.0.0"]
