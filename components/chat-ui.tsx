@@ -6,9 +6,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Send, Terminal, Bot, User, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Send, Terminal, Bot, User, Loader2, AlertCircle, CheckCircle2, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const funnyWaitingMessages = [
   "Consulting the ancient scrolls of Stack Overflow...",
@@ -32,6 +33,146 @@ const funnyWaitingMessages = [
   "Spinning up the hamster wheel...",
   "Channeling my inner Stack Overflow...",
 ];
+
+// ── Code block with copy button ──────────────────────────────────────────────
+function CodeBlock({ children, className }: { children?: React.ReactNode; className?: string }) {
+  const [copied, setCopied] = useState(false);
+  const code = typeof children === "string" ? children : "";
+  const lang = className?.replace("language-", "") ?? "shell";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="relative group my-3 rounded-xl overflow-hidden border border-white/10 bg-neutral-950">
+      {/* header bar */}
+      <div className="flex items-center justify-between px-4 py-2 bg-neutral-900 border-b border-white/10">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+            <span className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+          </div>
+          <span className="text-[10px] font-mono text-neutral-500 ml-1 uppercase tracking-widest">{lang}</span>
+        </div>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 text-[11px] text-neutral-400 hover:text-white transition-colors px-2 py-0.5 rounded hover:bg-white/5"
+        >
+          {copied ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
+          {copied ? "Copied!" : "Copy"}
+        </button>
+      </div>
+      <pre className="overflow-x-auto p-4 text-[13px] font-mono leading-relaxed text-emerald-300">
+        <code>{children}</code>
+      </pre>
+    </div>
+  );
+}
+
+// ── Custom markdown component map ────────────────────────────────────────────
+const markdownComponents: Components = {
+  // Headings
+  h1: ({ children }) => (
+    <h1 className="text-xl font-bold text-white mt-5 mb-3 pb-2 border-b border-white/10 flex items-center gap-2">
+      <span className="w-1 h-5 rounded-full bg-indigo-500 inline-block flex-shrink-0" />
+      {children}
+    </h1>
+  ),
+  h2: ({ children }) => (
+    <h2 className="text-base font-semibold text-indigo-300 mt-4 mb-2 flex items-center gap-2">
+      <span className="w-0.5 h-4 rounded-full bg-indigo-400 inline-block flex-shrink-0" />
+      {children}
+    </h2>
+  ),
+  h3: ({ children }) => (
+    <h3 className="text-sm font-semibold text-neutral-200 mt-3 mb-1.5 uppercase tracking-wide">
+      {children}
+    </h3>
+  ),
+  // Paragraph
+  p: ({ children }) => (
+    <p className="text-sm text-neutral-200 leading-relaxed my-2">{children}</p>
+  ),
+  // Lists
+  ul: ({ children }) => (
+    <ul className="my-2 space-y-1.5 pl-1">{children}</ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="my-2 space-y-1.5 pl-5 list-decimal marker:text-indigo-400">{children}</ol>
+  ),
+  li: ({ children }) => (
+    <li className="flex items-start gap-2 text-sm text-neutral-200 leading-relaxed">
+      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0" />
+      <span className="flex-1">{children}</span>
+    </li>
+  ),
+  // Inline code
+  code: ({ children, className }) => {
+    const isBlock = className?.startsWith("language-");
+    if (isBlock) return <code className={className}>{children}</code>;
+    return (
+      <code className="px-1.5 py-0.5 rounded-md bg-indigo-950/60 text-indigo-300 font-mono text-[12px] border border-indigo-500/20">
+        {children}
+      </code>
+    );
+  },
+  // Code block — delegated to CodeBlock
+  pre: ({ children }) => {
+    const child = children as React.ReactElement<{ className?: string; children?: React.ReactNode }>;
+    return (
+      <CodeBlock className={child?.props?.className}>
+        {child?.props?.children}
+      </CodeBlock>
+    );
+  },
+  // Blockquote — used for 💡 tip lines
+  blockquote: ({ children }) => (
+    <blockquote className="my-3 pl-4 pr-3 py-2.5 rounded-r-xl border-l-2 border-indigo-500 bg-indigo-950/30 text-sm text-indigo-200 italic">
+      {children}
+    </blockquote>
+  ),
+  // Horizontal rule
+  hr: () => (
+    <hr className="my-4 border-none h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+  ),
+  // Bold & italic
+  strong: ({ children }) => (
+    <strong className="font-semibold text-white">{children}</strong>
+  ),
+  em: ({ children }) => (
+    <em className="italic text-neutral-300">{children}</em>
+  ),
+  // Tables
+  table: ({ children }) => (
+    <div className="my-3 overflow-x-auto rounded-xl border border-white/10">
+      <table className="w-full text-sm">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => (
+    <thead className="bg-neutral-800 text-neutral-300 font-medium">{children}</thead>
+  ),
+  tbody: ({ children }) => (
+    <tbody className="divide-y divide-white/5">{children}</tbody>
+  ),
+  tr: ({ children }) => <tr className="hover:bg-white/5 transition-colors">{children}</tr>,
+  th: ({ children }) => <th className="px-4 py-2 text-left text-xs uppercase tracking-wider">{children}</th>,
+  td: ({ children }) => <td className="px-4 py-2.5 text-neutral-300">{children}</td>,
+  // Links
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-indigo-400 underline underline-offset-2 hover:text-indigo-300 transition-colors"
+    >
+      {children}
+    </a>
+  ),
+};
 
 interface CommandResult {
   command: string;
@@ -240,8 +381,13 @@ export function ChatUI() {
                       />
                     )}
                     {message.type === "assistant" ? (
-                      <div className="prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-headings:my-2 prose-code:bg-neutral-700 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-indigo-300 prose-pre:bg-neutral-900 prose-pre:border prose-pre:border-neutral-700">
-                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      <div className="min-w-0">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={markdownComponents}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
                       </div>
                     ) : (
                       message.content
