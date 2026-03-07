@@ -188,7 +188,7 @@ export function ChatUI() {
       <CardHeader className="border-b border-neutral-800 pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
           <Bot className="h-5 w-5 text-indigo-400" />
-          Leo's AI Intern
+          Leo&apos;s AI Intern
           <span className="text-xs text-neutral-500 font-normal ml-2">
             Powered by Gemini Flash 2.5
           </span>
