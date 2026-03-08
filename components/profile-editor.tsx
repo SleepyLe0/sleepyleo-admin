@@ -177,7 +177,7 @@ export function ProfileEditor() {
           <Field label="Education" value={profile.education} onChange={(v) => set("education", v)} placeholder="King Mongkut's University..." />
           <Field label="Location" value={profile.location} onChange={(v) => set("location", v)} placeholder="Bangkok, Thailand" />
           <Field label="Currently Focused On" value={profile.focus} onChange={(v) => set("focus", v)} placeholder="Full-stack dev..." />
-          <Field label="Runs On" value={profile.fuel} onChange={(v) => set("fuel", v)} placeholder="Coffee + anxiety" />
+          <Field label="Runs On" value={profile.fuel} onChange={(v) => set("fuel", v)} placeholder="Matcha + anxiety" />
         </div>
       </div>
 

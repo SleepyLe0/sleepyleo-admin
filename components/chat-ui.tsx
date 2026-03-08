@@ -17,7 +17,7 @@ const funnyWaitingMessages = [
   "Bribing the AI gods with virtual cookies...",
   "Asking ChatGPT if it's okay to help you...",
   "Untangling the spaghetti code in my brain...",
-  "Converting coffee to code at maximum speed...",
+  "Converting matcha to code at maximum speed...",
   "Googling 'how to be a good intern'...",
   "Pretending to work really hard...",
   "Downloading more RAM... just kidding...",
