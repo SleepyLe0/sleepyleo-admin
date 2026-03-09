@@ -14,8 +14,8 @@ export default async function SkillsPage() {
   if (!authenticated) redirect("/login");
 
   return (
-    <div className="min-h-screen bg-neutral-950 py-12 px-4">
-      <div className="max-w-3xl mx-auto flex flex-col gap-6">
+    <div className="min-h-screen bg-neutral-950 py-6 sm:py-12 px-4">
+      <div className="max-w-3xl mx-auto flex flex-col gap-4 sm:gap-6">
         <div className="flex items-center justify-between">
           <Link
             href="/"
@@ -28,8 +28,8 @@ export default async function SkillsPage() {
         </div>
 
         <div>
-          <h1 className="text-3xl font-bold text-white mb-1">Skills Manager</h1>
-          <p className="text-neutral-400 text-sm">Add, edit, and organise your tech stack by category.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Skills Manager</h1>
+          <p className="text-neutral-400 text-xs sm:text-sm">Add, edit, and organise your tech stack by category.</p>
         </div>
 
         <SkillsManager />

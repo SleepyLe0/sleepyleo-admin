@@ -43,18 +43,22 @@ const defaultProfile: ProfileData = {
   ctaCopy: "Let's build something.",
 };
 
+
+
 function Field({
   label,
   value,
   onChange,
   multiline = false,
   placeholder = "",
+  minRows = 3,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   multiline?: boolean;
   placeholder?: string;
+  minRows?: number;
 }) {
   const baseClass =
     "w-full rounded-xl border border-neutral-800 bg-neutral-900/50 px-4 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-colors";
@@ -69,8 +73,9 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          rows={3}
-          className={`${baseClass} resize-none`}
+          rows={minRows}
+          className={`${baseClass} resize-y`}
+          style={{ minHeight: `${minRows * 2}rem` }}
         />
       ) : (
         <input
@@ -161,17 +166,31 @@ export function ProfileEditor() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6">
       {/* Basic info */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-6 flex flex-col gap-4">
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4 sm:p-6 flex flex-col gap-4">
         <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Basic Info</h2>
         <Field label="Name" value={profile.name} onChange={(v) => set("name", v)} placeholder="SleepyLeo" />
-        <Field label="Bio" value={profile.bio} onChange={(v) => set("bio", v)} multiline placeholder="A short intro..." />
-        <Field label="Background" value={profile.background} onChange={(v) => set("background", v)} multiline placeholder="Longer story..." />
+        <Field
+          label="Bio"
+          value={profile.bio}
+          onChange={(v) => set("bio", v)}
+          multiline
+          minRows={3}
+          placeholder="A short intro..."
+        />
+        <Field
+          label="Background"
+          value={profile.background}
+          onChange={(v) => set("background", v)}
+          multiline
+          minRows={4}
+          placeholder="Longer story..."
+        />
       </div>
 
       {/* Details */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-6 flex flex-col gap-4">
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4 sm:p-6 flex flex-col gap-4">
         <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Details</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Education" value={profile.education} onChange={(v) => set("education", v)} placeholder="King Mongkut's University..." />
@@ -182,16 +201,18 @@ export function ProfileEditor() {
       </div>
 
       {/* Contact links */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-6 flex flex-col gap-4">
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4 sm:p-6 flex flex-col gap-4">
         <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Contact Links</h2>
-        <Field label="Email" value={profile.email} onChange={(v) => set("email", v)} placeholder="you@example.com" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Email" value={profile.email} onChange={(v) => set("email", v)} placeholder="you@example.com" />
+          <Field label="CTA Copy" value={profile.ctaCopy} onChange={(v) => set("ctaCopy", v)} placeholder="Let's build something." />
+        </div>
         <Field label="GitHub username" value={profile.github} onChange={(v) => set("github", v)} placeholder="SleepyLe0" />
         <Field label="LinkedIn handle" value={profile.linkedin} onChange={(v) => set("linkedin", v)} placeholder="kundids-khawmeesri-90814526a" />
-        <Field label="CTA Copy" value={profile.ctaCopy} onChange={(v) => set("ctaCopy", v)} placeholder="Let's build something." />
       </div>
 
       {/* Availability */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-6 flex flex-col gap-4">
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4 sm:p-6 flex flex-col gap-4">
         <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Availability</h2>
         <label className="flex items-center gap-3 cursor-pointer">
           <button
@@ -199,7 +220,7 @@ export function ProfileEditor() {
             role="switch"
             aria-checked={profile.availableForHire}
             onClick={() => set("availableForHire", !profile.availableForHire)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${profile.availableForHire ? "bg-green-500" : "bg-neutral-700"}`}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none ${profile.availableForHire ? "bg-green-500" : "bg-neutral-700"}`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${profile.availableForHire ? "translate-x-6" : "translate-x-1"}`}
@@ -216,7 +237,7 @@ export function ProfileEditor() {
       </div>
 
       {/* Timeline */}
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-6 flex flex-col gap-4">
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-900/30 p-4 sm:p-6 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Timeline</h2>
           <button
@@ -234,24 +255,24 @@ export function ProfileEditor() {
 
         <div className="flex flex-col gap-3">
           {profile.timeline.map((item, i) => (
-            <div key={i} className="flex items-start gap-3">
+            <div key={i} className="flex items-start gap-2 sm:gap-3">
               <input
                 type="text"
                 value={item.year}
                 onChange={(e) => updateTimelineItem(i, "year", e.target.value)}
                 placeholder="2024"
-                className="w-20 rounded-lg border border-neutral-800 bg-neutral-900/50 px-3 py-2 text-sm text-white placeholder:text-neutral-600 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-colors"
+                className="w-16 sm:w-20 flex-shrink-0 rounded-lg border border-neutral-800 bg-neutral-900/50 px-2 sm:px-3 py-2 text-sm text-white placeholder:text-neutral-600 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-colors"
               />
               <input
                 type="text"
                 value={item.event}
                 onChange={(e) => updateTimelineItem(i, "event", e.target.value)}
                 placeholder="Event description..."
-                className="flex-1 rounded-lg border border-neutral-800 bg-neutral-900/50 px-3 py-2 text-sm text-white placeholder:text-neutral-600 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-colors"
+                className="flex-1 min-w-0 rounded-lg border border-neutral-800 bg-neutral-900/50 px-3 py-2 text-sm text-white placeholder:text-neutral-600 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-colors"
               />
               <button
                 onClick={() => removeTimelineItem(i)}
-                className="mt-0.5 rounded-lg border border-neutral-800 p-2 text-neutral-500 hover:border-red-500/50 hover:text-red-400 transition-colors"
+                className="flex-shrink-0 mt-0.5 rounded-lg border border-neutral-800 p-2 text-neutral-500 hover:border-red-500/50 hover:text-red-400 transition-colors"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -261,16 +282,16 @@ export function ProfileEditor() {
       </div>
 
       {/* Save button */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pb-4">
         {status && (
-          <p className={`text-sm ${status.type === "success" ? "text-green-400" : "text-red-400"}`}>
+          <p className={`text-sm text-center sm:text-left ${status.type === "success" ? "text-green-400" : "text-red-400"}`}>
             {status.message}
           </p>
         )}
         <button
           onClick={handleSave}
           disabled={saving}
-          className="ml-auto inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white transition-all hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="sm:ml-auto w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 sm:py-2.5 text-sm font-medium text-white transition-all hover:bg-indigo-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {saving ? "Saving..." : "Save Profile"}

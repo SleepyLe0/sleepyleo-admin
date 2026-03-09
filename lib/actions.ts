@@ -405,9 +405,15 @@ export async function getSystemHealth(): Promise<{
   try {
     const healthCommand = `
       cpu_usage=$(awk '/^cpu / {idle=$5; total=$2+$3+$4+$5+$6+$7+$8; print int(100*(total-idle)/total)}' /proc/stat 2>/dev/null || echo "0")
+      phys_mem_mb=$(dmidecode -t memory 2>/dev/null | awk '/\\tSize: [0-9]+ (MB|GB)/ {if($3=="GB") sum+=$2*1024; else sum+=$2} END {print sum+0}')
+      if [ "$phys_mem_mb" = "0" ] || [ -z "$phys_mem_mb" ]; then
+        mem_total=$(awk '/MemTotal/ {print $2*1024}' /proc/meminfo)
+      else
+        mem_total=$((phys_mem_mb * 1024 * 1024))
+      fi
       echo "{
         \\"cpu\\": $cpu_usage,
-        \\"memTotal\\": $(free -b | awk '/Mem:/ {print $2}'),
+        \\"memTotal\\": $mem_total,
         \\"memUsed\\": $(free -b | awk '/Mem:/ {print $3}'),
         \\"uptime\\": $(cat /proc/uptime | awk '{print int($1)}'),
         \\"platform\\": \\"$(uname -s | tr '[:upper:]' '[:lower:]')\\",

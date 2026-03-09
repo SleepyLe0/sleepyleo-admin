@@ -63,22 +63,22 @@ export default async function InternPage() {
       {/* Main content - centered */}
       <main className="flex-1 flex items-center justify-center px-4 pt-20 pb-8">
         <div className="max-w-7xl w-full">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">
               Leo&apos;s AI Intern
             </h1>
-            <p className="text-neutral-400 text-base max-w-xl mx-auto">
+            <p className="text-neutral-400 text-sm sm:text-base max-w-xl mx-auto">
               Meet my AI-powered intern! Tell it what you need in plain English
               and it&apos;ll figure out the right commands. Powered by Gemini 2.5.
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 order-2 lg:order-1">
               <ChatUI />
             </div>
 
-            <div className="space-y-4">
+            <div className="order-1 lg:order-2 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3 sm:gap-4">
               <Card className="bg-yellow-900/30 border-yellow-500/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-yellow-400 flex items-center gap-2 text-base">
