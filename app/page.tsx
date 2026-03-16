@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAuthenticated } from "@/lib/auth";
 import { ProjectManager } from "@/components/project-manager";
-import { LogoutButton } from "@/components/logout-button";
 import Link from "next/link";
 import { Bot, ArrowRight, Activity, Home, User, Code2 } from "lucide-react";
 
@@ -79,7 +78,7 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        {/* Heading + logout */}
+        {/* Heading */}
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">
@@ -88,9 +87,6 @@ export default async function AdminPage() {
             <p className="text-neutral-400 text-sm">
               Import projects from GitHub, manage visibility, and customize details.
             </p>
-          </div>
-          <div className="flex flex-col items-end gap-2 ml-4 flex-shrink-0">
-            <LogoutButton />
           </div>
         </div>
 

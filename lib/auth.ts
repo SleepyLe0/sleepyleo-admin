@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 const AUTH_COOKIE_NAME = "sleepyleo_auth";
 const AUTH_SECRET = process.env.AUTH_SECRET || "default-secret-change-me";
@@ -44,16 +45,20 @@ export function verifySessionToken(token: string): boolean {
   }
 }
 
-export function validateCredentials(username: string, password: string): boolean {
-  const adminUsername = process.env.ADMIN_USERNAME;
-  const adminPassword = process.env.ADMIN_PASSWORD;
+export function validateCredentials(password: string): boolean {
+  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
 
-  if (!adminUsername || !adminPassword) {
-    console.error("Admin credentials not configured");
+  if (!adminPasswordHash) {
+    console.error("Admin credentials not configured or ADMIN_PASSWORD_HASH is missing");
     return false;
   }
 
-  return username === adminUsername && password === adminPassword;
+  try {
+    return bcrypt.compareSync(password, adminPasswordHash);
+  } catch (error) {
+    console.error("Error verifying password hash", error);
+    return false;
+  }
 }
 
 export async function setAuthCookie(token: string): Promise<void> {

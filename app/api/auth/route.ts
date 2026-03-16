@@ -68,16 +68,16 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { username, password } = body;
+    const { password } = body;
 
-    if (!username || !password) {
+    if (!password) {
       return NextResponse.json(
-        { error: "Username and password are required" },
+        { error: "Password is required" },
         { status: 400 }
       );
     }
 
-    if (!validateCredentials(username, password)) {
+    if (!validateCredentials(password)) {
       recordFailure(ip);
       return NextResponse.json(
         { error: "Invalid credentials" },

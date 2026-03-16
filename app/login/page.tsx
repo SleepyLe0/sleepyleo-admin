@@ -9,7 +9,6 @@ import { Loader2, Lock } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,7 +22,7 @@ export default function LoginPage() {
       const response = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ password }),
       });
 
       const data = await response.json();
@@ -61,21 +60,6 @@ export default function LoginPage() {
                 {error}
               </div>
             )}
-
-            <div>
-              <label className="text-sm text-neutral-400 block mb-1">
-                Username
-              </label>
-              <Input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="bg-neutral-800 border-neutral-700"
-                placeholder="Enter username"
-                required
-                autoComplete="username"
-              />
-            </div>
 
             <div>
               <label className="text-sm text-neutral-400 block mb-1">
