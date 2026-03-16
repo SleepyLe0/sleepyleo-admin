@@ -20,6 +20,7 @@ function createPrismaClient(): PrismaClient | null {
       globalForPrisma.pool = pool;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const adapter = new PrismaPg(pool as any);
     return new PrismaClient({ adapter });
   } catch (error) {
