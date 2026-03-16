@@ -20,7 +20,7 @@ function createPrismaClient(): PrismaClient | null {
       globalForPrisma.pool = pool;
     }
 
-    const adapter = new PrismaPg(pool);
+    const adapter = new PrismaPg(pool as any);
     return new PrismaClient({ adapter });
   } catch (error) {
     console.error("Failed to create Prisma client:", error);
